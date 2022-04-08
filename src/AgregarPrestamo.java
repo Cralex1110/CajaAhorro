@@ -18,6 +18,7 @@ public class AgregarPrestamo extends JFrame{
         setSize(400,220);
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(83,94,93));
+        setResizable(false);
 
         Font font = new Font("Verdana", Font.PLAIN, 20);
 

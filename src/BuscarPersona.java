@@ -17,6 +17,7 @@ public class BuscarPersona extends JFrame{
         setSize(400,200);
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(83,94,93));
+        setResizable(false);
 
         Font font = new Font("Verdana", Font.PLAIN, 20);
 
@@ -46,7 +47,7 @@ public class BuscarPersona extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 Caja res = f.buscar(nom.getSelectedItem().toString());
 
-                JOptionPane.showMessageDialog(null, "\nNombre: " + res.getNombre() + "\nCantidad: " + res.getCantidad() + "\nIntereses: " + res.getIntereses() + "\nPrestamos: " + res.getPrestamos() + "\nReditos: " + res.getReditos() + "\nRetiros: " + res.getRetiros() + "\nTOTAL: " + res.getTotal() + "\nSeamanas: " + res.getSemanas(), "Resultado", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Nombre: " + res.getNombre() + "\nCantidad: " + res.getCantidad() + "\nIntereses: " + res.getIntereses() + "\nPrestamos: " + res.getPrestamos() + "\nReditos: " + res.getReditos() + "\nRetiros: " + res.getRetiros() + "\nTOTAL: " + res.getTotal() + "\nSeamanas: " + res.getSemanas(), "Resultado", JOptionPane.PLAIN_MESSAGE);
             }
         });
         setVisible(true);

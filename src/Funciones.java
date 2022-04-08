@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class Funciones {
     String  driver = "com.mysql.cj.jdbc.Driver";
-    String url = "jdbc:mysql://localhost/caja";
+    String url = "jdbc:mysql://192.168.1.64/caja";
     String user = "root";
     String pw = "";
 
@@ -32,6 +32,10 @@ public class Funciones {
 
     public double obtenerInteres(double cant, int dia){
         return (cant*((360d-Double.valueOf(dia))/360d)*(0.05));
+    }
+
+    public double obtenerInteresPrestamo(double cant){
+        return (cant*0.1);
     }
 
     public double obtenerDinero(){
@@ -321,6 +325,34 @@ public class Funciones {
         return null;
     }
 
+    public ArrayList<String> obtenerReditosLista(){
+        ArrayList<String> names = new ArrayList<String>();
+        try{
+            Class.forName(driver);
+
+            Connection con = null; 
+            con = DriverManager.getConnection(url,user,pw);
+
+            Statement st = null;
+            st = con.createStatement();
+
+            String query = "SELECT IdRedito FROM `reditos`;";
+
+            ResultSet rs = null;
+            rs = st.executeQuery(query);
+
+            while (rs.next()) {  
+                names.add(rs.getString(1));
+            }
+            return names;
+        }catch(ClassNotFoundException ex){
+            JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
+        }catch(SQLException ex){
+            JOptionPane.showMessageDialog(null, "ERROR", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+    }
+
     public void agregar(String nom, double mon){
         try{
             Class.forName(driver);
@@ -479,7 +511,7 @@ public class Funciones {
         }
     }
 
-    public Prestamo datosPrestamo(int id){
+    public Prestamo datosPrestamo(String id){
         Prestamo enc = new Prestamo();
         try{
             double cant=0d, redi=0d, pago=0d, pare=0d;
@@ -491,22 +523,22 @@ public class Funciones {
             Statement st = null;
             st = con.createStatement();
 
-            String query = "SELECT * FROM prestamos WHERE prestamos.IdPrestamo = "+id+";";
+            String query = "SELECT * FROM prestamos WHERE prestamos.IdPrestamo = '"+id+"';";
             ResultSet rs = null;
             rs = st.executeQuery(query);
             while (rs.next()) {
                 enc.setId(Integer.parseInt(rs.getString(1)));
                 enc.setNombre(rs.getString(2));
                 enc.setFechaPrestamo(rs.getString(3));
+                enc.setCantidadPrestamo(rs.getDouble(4));
                 cant = rs.getDouble(4);
-                enc.setCantidadPrestamo(cant);
                 if(rs.getString(5)==null){
-                    enc.setFechaPrestamo("NULL");
+                    enc.setFechaTermino("NULL");
                 }else{
                     enc.setFechaTermino(rs.getString(5));
                 }
             }
-            query = "SELECT SUM(reditos.ReditosPrestamo) FROM reditos WHERE reditos.IdPrestamo = "+id+";";
+            query = "SELECT SUM(reditos.ReditosPrestamo) FROM reditos WHERE reditos.IdPrestamo = '"+id+"';";
             rs = st.executeQuery(query);
             while (rs.next()) {
                 if(rs.getString(1)==null){
@@ -515,7 +547,7 @@ public class Funciones {
                     redi = rs.getDouble(1);
                 }
             }
-            query = "SELECT SUM(pagos.PagoPrestamo) FROM `pagos` WHERE pagos.IdPrestamo = "+id+";";
+            query = "SELECT SUM(pagos.PagoPrestamo) FROM `pagos` WHERE pagos.IdPrestamo = '"+id+"';";
             rs = st.executeQuery(query);
             while (rs.next()) {
                 if(rs.getString(1)==null){
@@ -524,7 +556,7 @@ public class Funciones {
                     pago = rs.getDouble(1);
                 }
             }
-            query = "SELECT SUM(pagoreditos.PagoRedito) FROM pagoreditos WHERE pagoreditos.IdPrestamo = 5;";
+            query = "SELECT SUM(pagoreditos.PagoRedito) FROM pagoreditos WHERE pagoreditos.IdPrestamo = '"+id+"';";
             rs = st.executeQuery(query);
             while (rs.next()) {
                 if(rs.getString(1)==null){
@@ -535,6 +567,7 @@ public class Funciones {
             }
             enc.setReditos(redi - pare);
             enc.setTotal((cant + redi)-(pago + pare));
+
             return enc;
         }catch(ClassNotFoundException ex){
             JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
@@ -567,8 +600,10 @@ public class Funciones {
         }
     }
 
-    public int obtenerIdReditos(int id){
+    public Reditos datosReditos(String id){
+        Reditos enc = new Reditos();
         try{
+            double redi=0d, pago=0d;
             Class.forName(driver);
 
             Connection con = null; 
@@ -577,20 +612,38 @@ public class Funciones {
             Statement st = null;
             st = con.createStatement();
 
-            String query = "SELECT reditos.IdRedito FROM reditos WHERE reditos.IdPrestamo = 5;";
+            String query = "SELECT * FROM reditos WHERE IdRedito = '"+id+"';";
             ResultSet rs = null;
             rs = st.executeQuery(query);
-            int res = 0;
             while (rs.next()) {
-                res = rs.getInt(1);
+                enc.setIdRedito(rs.getInt(1));
+                enc.setIdPrestamo(rs.getInt(2));
+                enc.setNombre(rs.getString(3));
+                enc.setFechaReditos(rs.getString(4));
+                enc.setReditosPrestamo(rs.getDouble(5));
+                redi = rs.getDouble(5);
             }
-            return res;
+            query = "SELECT PagoRedito FROM `pagoreditos` WHERE IdRedito = '"+id+"';";
+            rs = st.executeQuery(query);
+            while (rs.next()) {
+                pago = rs.getDouble(1);
+            }
+            double total = redi - pago;
+
+            if(total==0d){
+                enc.setStatus("Pagado");
+            }else{
+                enc.setStatus("Sin pagar");
+            }
+
+            st.close();
+            return enc;
         }catch(ClassNotFoundException ex){
             JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
         }catch(SQLException ex){
             JOptionPane.showMessageDialog(null, "ERROR", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        return 0;
+        return null;
     }
 
     public void pagarReditos(int id, double can, String nom, int idred){
@@ -609,6 +662,90 @@ public class Funciones {
             st.close();
 
             JOptionPane.showMessageDialog(null, "Pago-redito agregado exitosamente");
+        }catch(ClassNotFoundException ex){
+            JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
+        }catch(SQLException ex){
+            JOptionPane.showMessageDialog(null, "ERROR", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void generarReditos(){
+        try{
+            Class.forName(driver);
+            Connection con = DriverManager.getConnection(url, user, pw);
+            Statement st = con.createStatement();
+
+            ArrayList<String> pres = obtenerPrestamosLista();
+
+            for(int i=0;i<pres.size();i++){
+                Prestamo prestamo = datosPrestamo(pres.get(i));
+                if(prestamo.getTotal()!=0){
+                    String hoy = obtenerFecha();
+                    String[] part = hoy.split("-");
+                    int mes = Integer.parseInt(part[1]);
+                    int dia = Integer.parseInt(part[2]);
+                    String fecha = prestamo.getFechaPrestamo();
+                    String part2[] = fecha.split("-");
+                    int mes2 = Integer.parseInt(part2[1]);
+                    int dia2 = Integer.parseInt(part2[2]);
+
+                    if(dia == dia2 && mes > mes2){
+                        String query = "SELECT * FROM reditos WHERE IdPrestamo = '"+prestamo.getId()+"';";
+                        ResultSet rs = null;
+                        rs = st.executeQuery(query);
+
+                        ArrayList<String> fechas = new ArrayList<String>();
+                        while (rs.next()) {
+                            fechas.add(rs.getString(4));
+                        }
+
+                        int cont = 0;
+                        for(int k=0;k<fechas.size();k++){
+                            String tem = fechas.get(k);
+                            if(tem.equals(hoy)){
+                                cont += 1;
+                            }
+                        }
+
+                        if(cont<1 || fechas==null){
+                            double can = obtenerInteresPrestamo(prestamo.getTotal());
+                            query = "INSERT INTO `reditos` (`IdRedito`, `IdPrestamo`, `Nombre`, `FechaReditos`, `ReditosPrestamo`) VALUES (NULL, '"+prestamo.getId()+"', '"+prestamo.getNombre()+"', '"+hoy+"', '"+can+"')";
+                            st.execute(query);
+                            JOptionPane.showMessageDialog(null, "Reditos generados correctamente");
+                        }
+                    }
+                }
+            }
+
+            st.close();
+        }catch(ClassNotFoundException ex){
+            JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
+        }catch(SQLException ex){
+            JOptionPane.showMessageDialog(null, "ERROR", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void retirarCaja(String nom, double can, String fecha){
+        Caja res = new Caja();
+        try{
+            Class.forName(driver);
+
+            Connection con = null; 
+            con = DriverManager.getConnection(url,user,pw);
+
+            Statement st = null;
+            st = con.createStatement();
+
+            res = buscar(nom);
+
+            if(res.getTotal()>=can){
+                String query = "INSERT INTO `retiros` (`IdRetiro`, `Nombre`, `Cantidad`, `Fecha`) VALUES (NULL, '"+nom+"', '"+can+"', '"+fecha+"')";
+                st.execute(query);
+                st.close();
+                JOptionPane.showMessageDialog(null, "Retiro hecho exitosamente");
+            }else{
+                JOptionPane.showMessageDialog(null, "El usuario no tiene suficiente dinero para la operación");
+            }
         }catch(ClassNotFoundException ex){
             JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
         }catch(SQLException ex){

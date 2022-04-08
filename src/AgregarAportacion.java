@@ -18,6 +18,7 @@ public class AgregarAportacion extends JFrame implements ActionListener{
         setSize(400,250);
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(83,94,93));
+        setResizable(false);
 
         Font font = new Font("Verdana", Font.PLAIN, 20);
 
@@ -78,7 +79,13 @@ public class AgregarAportacion extends JFrame implements ActionListener{
                 int dia = f.obtenerDia();
                 double red = f.obtenerInteres(can, dia);
                 f.agregarAporte(nom, can, fecha, dia, red);
-                this.setVisible(false);
+                nom = null;
+                can = 0d;
+                fecha = null;
+                dia = 0;
+                red = 0d;
+                tf.setText("");
+                cb.setSelectedItem("");
             }
         }
     }

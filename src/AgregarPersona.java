@@ -15,6 +15,7 @@ public class AgregarPersona extends JFrame implements ActionListener{
         setSize(400,250);
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(83,94,93));
+        setResizable(false);
 
         Font font = new Font("Verdana", Font.PLAIN, 20);
 

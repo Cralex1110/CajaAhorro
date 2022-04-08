@@ -5,8 +5,8 @@ import java.awt.Font;
 import java.awt.Image;
 
 public class Menu extends JFrame implements ActionListener{
-    private JLabel lb1, lb2, lb3, lb4, lb5, lb6, lblogo, lbsem;
-    private JButton b1,b2,b3,b4,b5,b6;
+    private JLabel lb1, lb2, lb3, lb4, lb5, lb6, lblogo, lbsem, lbdin, lbint, lbpre, lbred, lbret, lbtot;
+    private JButton b1,b2,b3,b4,b5,b6,bshow;
     Funciones f = new Funciones();
 
     public Menu(){
@@ -17,6 +17,7 @@ public class Menu extends JFrame implements ActionListener{
         setLocationRelativeTo(null);
         setIconImage(new ImageIcon(getClass().getResource("/img/logo.png")).getImage());
         getContentPane().setBackground(new Color(83,94,93));
+        setResizable(false);
 
         ImageIcon logo = new ImageIcon(getClass().getResource("/img/logo.png"));
         int ancho = 220;
@@ -47,35 +48,46 @@ public class Menu extends JFrame implements ActionListener{
         lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
         add(lbsem);
 
-        lbsem = new JLabel("<html><p align='right', color='yellow'>Dinero: " + f.obtenerDinero() + "</html></p>");
-        lbsem.setBounds(170,350,200,40);
-        lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        add(lbsem);
+        bshow = new JButton("...");
+        bshow.setBounds(20,390,20,20);
+        add(bshow);
+        bshow.addActionListener(this);
 
-        lbsem = new JLabel("<html><p align='right', color='yellow'>Intereses: " + f.obtenerInteresP() + "</html></p>");
-        lbsem.setBounds(320,350,200,40);
-        lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        add(lbsem);
+        lbdin = new JLabel("<html><p align='right', color='yellow'>Dinero: \t" + f.obtenerDinero() + "</html></p>");
+        lbdin.setBounds(170,350,200,40);
+        lbdin.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        lbdin.setVisible(false);
+        add(lbdin);
 
-        lbsem = new JLabel("<html><p align='right', color='yellow'>Prestamos: " + (f.obtenerPrestamos() - f.obtenerPagoPrestamo()) + "</html></p>");
-        lbsem.setBounds(470,350,200,40);
-        lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        add(lbsem);
+        lbint = new JLabel("<html><p align='right', color='yellow'>Intereses: " + f.obtenerInteresP() + "</html></p>");
+        lbint.setBounds(320,350,200,40);
+        lbint.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        lbint.setVisible(false);
+        add(lbint);
 
-        lbsem = new JLabel("<html><p align='right', color='yellow'>Reditos: " + (f.obtenerReditos() - f.obtenerPagoReditos()) + "</html></p>");
-        lbsem.setBounds(620,350,200,40);
-        lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        add(lbsem);
+        lbpre = new JLabel("<html><p align='right', color='yellow'>Prestamos: " + (f.obtenerPrestamos() - f.obtenerPagoPrestamo()) + "</html></p>");
+        lbpre.setBounds(470,350,200,40);
+        lbpre.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        lbpre.setVisible(false);
+        add(lbpre);
 
-        lbsem = new JLabel("<html><p align='right', color='yellow'>Retiros: " + f.obtenerRetiros() + "</html></p>");
-        lbsem.setBounds(170,375,200,40);
-        lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        add(lbsem);
+        lbred = new JLabel("<html><p align='right', color='yellow'>Reditos: " + (f.obtenerReditos() - f.obtenerPagoReditos()) + "</html></p>");
+        lbred.setBounds(620,350,200,40);
+        lbred.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        lbred.setVisible(false);
+        add(lbred);
 
-        lbsem = new JLabel("<html><p align='right', color='red'>Total: " + ((f.obtenerDinero()+f.obtenerInteresP())-(f.obtenerPrestamos()+f.obtenerReditos()+f.obtenerRetiros())) + "</html></p>");
-        lbsem.setBounds(320,375,200,40);
-        lbsem.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        add(lbsem);
+        lbret = new JLabel("<html><p align='right', color='yellow'>Retiros: " + f.obtenerRetiros() + "</html></p>");
+        lbret.setBounds(170,375,200,40);
+        lbret.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        lbret.setVisible(false);
+        add(lbret);
+
+        lbtot = new JLabel("<html><p align='right', color='yellow'><u>Total: " + ((f.obtenerDinero()+f.obtenerInteresP())-(f.obtenerPrestamos()+f.obtenerReditos()+f.obtenerRetiros())) + "</u></html></p>");
+        lbtot.setBounds(320,375,200,40);
+        lbtot.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        lbtot.setVisible(false);
+        add(lbtot);
 
         lb1 = new JLabel("<html><p align='right', color='white'>1. Agregar persona</html></p>");
         lb1.setBounds(20,20,300,40);
@@ -131,6 +143,8 @@ public class Menu extends JFrame implements ActionListener{
         add(b6);
         b6.addActionListener(this);
 
+        f.generarReditos();
+
         setVisible(true);
     }
 
@@ -145,6 +159,24 @@ public class Menu extends JFrame implements ActionListener{
             new AgregarPrestamo();
         }else if(e.getSource()==b5){
             new PagarPrestamo();
+        }else if(e.getSource()==b6){
+            new RetiroCaja();
+        }else if(e.getSource()==bshow){
+            if(lbdin.isVisible()==false){
+                lbdin.setVisible(true);
+                lbint.setVisible(true);
+                lbpre.setVisible(true);
+                lbred.setVisible(true);
+                lbret.setVisible(true);
+                lbtot.setVisible(true);
+            }else{
+                lbdin.setVisible(false);
+                lbint.setVisible(false);
+                lbpre.setVisible(false);
+                lbred.setVisible(false);
+                lbret.setVisible(false);
+                lbtot.setVisible(false);
+            }
         }
     }
 }
