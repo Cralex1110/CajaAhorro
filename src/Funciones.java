@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class Funciones {
     String  driver = "com.mysql.cj.jdbc.Driver";
-    String url = "jdbc:mysql://192.168.1.75/caja";
+    String url = "jdbc:mysql://localhost/caja";
     String user = "root";
     String pw = "";
 
