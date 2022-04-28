@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class Funciones {
     String  driver = "com.mysql.cj.jdbc.Driver";
-    String url = "jdbc:mysql://localhost/caja";
+    String url = "jdbc:mysql://192.168.1.64/caja";
     String user = "root";
     String pw = "";
 
@@ -707,7 +707,7 @@ public class Funciones {
                             }
                         }
 
-                        if(cont==0 || fechas.size()==0){
+                        if(cont<1 || fechas==null){
                             double can = obtenerInteresPrestamo(prestamo.getTotal());
                             query = "INSERT INTO `reditos` (`IdRedito`, `IdPrestamo`, `Nombre`, `FechaReditos`, `ReditosPrestamo`) VALUES (NULL, '"+prestamo.getId()+"', '"+prestamo.getNombre()+"', '"+hoy+"', '"+can+"')";
                             st.execute(query);
@@ -718,6 +718,34 @@ public class Funciones {
             }
 
             st.close();
+        }catch(ClassNotFoundException ex){
+            JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
+        }catch(SQLException ex){
+            JOptionPane.showMessageDialog(null, "ERROR", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void retirarCaja(String nom, double can, String fecha){
+        Caja res = new Caja();
+        try{
+            Class.forName(driver);
+
+            Connection con = null; 
+            con = DriverManager.getConnection(url,user,pw);
+
+            Statement st = null;
+            st = con.createStatement();
+
+            res = buscar(nom);
+
+            if(res.getTotal()>=can){
+                String query = "INSERT INTO `retiros` (`IdRetiro`, `Nombre`, `Cantidad`, `Fecha`) VALUES (NULL, '"+nom+"', '"+can+"', '"+fecha+"')";
+                st.execute(query);
+                st.close();
+                JOptionPane.showMessageDialog(null, "Retiro hecho exitosamente");
+            }else{
+                JOptionPane.showMessageDialog(null, "El usuario no tiene suficiente dinero para la operación");
+            }
         }catch(ClassNotFoundException ex){
             JOptionPane.showMessageDialog(null, "Clase no encontrada", "Error", JOptionPane.ERROR_MESSAGE);
         }catch(SQLException ex){

@@ -79,6 +79,13 @@ public class AgregarAportacion extends JFrame implements ActionListener{
                 int dia = f.obtenerDia();
                 double red = f.obtenerInteres(can, dia);
                 f.agregarAporte(nom, can, fecha, dia, red);
+                nom = null;
+                can = 0d;
+                fecha = null;
+                dia = 0;
+                red = 0d;
+                tf.setText("");
+                cb.setSelectedItem("");
             }
         }
     }

@@ -159,6 +159,8 @@ public class Menu extends JFrame implements ActionListener{
             new AgregarPrestamo();
         }else if(e.getSource()==b5){
             new PagarPrestamo();
+        }else if(e.getSource()==b6){
+            new RetiroCaja();
         }else if(e.getSource()==bshow){
             if(lbdin.isVisible()==false){
                 lbdin.setVisible(true);
